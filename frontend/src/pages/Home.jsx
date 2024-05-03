@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import Register from "../components/Register";
 
 const Home = () => {
+  const [showForm, setShowForm] = useState(false);
+
   return (
     <>
-      <Register />
+      {showForm && <Register setShowForm={setShowForm} />}
       <Container
         className="d-flex justify-content-center align-items-center"
         style={{ height: "100vh" }}
@@ -43,7 +45,10 @@ const Home = () => {
                 />
                 <hr />
               </div>
-              <Button className="my-2 bg-info  text-white fw-bolder rounded-pill w-100 border">
+              <Button
+                onClick={() => setShowForm(true)}
+                className="my-2 bg-info  text-white fw-bolder rounded-pill w-100 border"
+              >
                 Create Account
               </Button>
               <p style={{ fontSize: "0.7rem" }} className="">
