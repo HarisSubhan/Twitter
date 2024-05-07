@@ -1,11 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Form, FormControl, FormSelect } from "react-bootstrap";
-import { IoMdClose, IoMdCloseCircle } from "react-icons/io";
-import { useDispatch } from "react-redux";
-import { regUser } from "../features/auth/authSlice";
+import { Button, Card, Form } from "react-bootstrap";
+import { IoMdCloseCircle } from "react-icons/io";
+import { useDispatch, useSelector } from "react-redux";
+import { regUser, reset } from "../features/auth/authSlice";
+import { BarLoader } from "react-spinners";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+
 const Register = ({ setShowForm }) => {
-  const date = new Date();
-  const currentYear = date.getFullYear();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { user, isLoading, message, isError, isSuccess } = useSelector(
+    (state) => state.auth
+  );
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+
+    if (isSuccess) {
+      navigate("/home");
+    }
+
+    dispatch(reset());
+  }, [isError, isSuccess]);
+
+  let date = new Date();
+  let currentYear = date.getFullYear();
   const [disabled, setDisabled] = useState(true);
 
   const [formFields, setFormFields] = useState({
@@ -48,8 +71,6 @@ const Register = ({ setShowForm }) => {
     "November",
     "December",
   ];
-
-  const dispatch = useDispatch();
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -107,8 +128,13 @@ const Register = ({ setShowForm }) => {
               This will not be shown publicly. Confirm your own age, even if
               this account is for a business, a pet, or something else.
             </p>
-            <div value={month} className="d-flex gap-4 ">
-              <Form.Select onChange={handleChange} className="p-4">
+            <div className="d-flex gap-4 ">
+              <Form.Select
+                value={month}
+                onChange={handleChange}
+                className="p-4"
+                name="month"
+              >
                 {months?.map((month, index) => {
                   return (
                     <option key={index} value={month}>
@@ -117,7 +143,12 @@ const Register = ({ setShowForm }) => {
                   );
                 })}
               </Form.Select>
-              <Form.Select value={day} onChange={handleChange}>
+              <Form.Select
+                className="p-4"
+                value={day}
+                name="day"
+                onChange={handleChange}
+              >
                 {Array.from({ length: 31 }).map((_, index) => {
                   return (
                     <option key={index} value={index + 1}>
@@ -126,8 +157,8 @@ const Register = ({ setShowForm }) => {
                   );
                 })}
               </Form.Select>
-              <Form.Select value={year} onChange={handleChange}>
-                {Array.from({ length: 120 }).map((_, index) => {
+              <Form.Select name="year" value={year} onChange={handleChange}>
+                {Array.from({ length: 121 }).map((_, index) => {
                   return (
                     <option key={index} value={currentYear - index}>
                       {currentYear - index}
@@ -143,7 +174,7 @@ const Register = ({ setShowForm }) => {
             variant={disabled ? "secondary" : "dark"}
             className="w-100 rounded-pill mt-5 p-3"
           >
-            Next
+            {isLoading ? <BarLoader color="#ffffff" /> : "Next"}
           </Button>
         </Card>
       </div>

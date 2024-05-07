@@ -1,13 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import Register from "../components/Register";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import SignIn from "../components/SignIn";
 
 const Home = () => {
   const [showForm, setShowForm] = useState(false);
-
+  const [showForm2, setShowForm2] = useState(false);
+  const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (user) {
+      navigate("/home");
+    }
+  }, [navigate]);
   return (
     <>
       {showForm && <Register setShowForm={setShowForm} />}
+      {showForm2 && <SignIn setShowForm2={setShowForm} />}
       <Container
         className="d-flex justify-content-center align-items-center"
         style={{ height: "100vh" }}
@@ -56,7 +67,10 @@ const Home = () => {
                 Policy, including Cookie Use.
               </p>
               <h6>Already have an Account</h6>
-              <Button className="my-2 bg-transparent text-info fw-bolder rounded-pill w-100 border">
+              <Button
+                onClick={() => setShowForm2(true)}
+                className="my-2 bg-transparent text-info fw-bolder rounded-pill w-100 border"
+              >
                 Sign in
               </Button>
             </Col>
