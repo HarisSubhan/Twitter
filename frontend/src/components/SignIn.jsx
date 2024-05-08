@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Card, Form } from "react-bootstrap";
 import { IoMdCloseCircle } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { regUser, reset } from "../features/auth/authSlice";
+import { logUser, reset } from "../features/auth/authSlice";
 import { BarLoader } from "react-spinners";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -57,7 +57,7 @@ const SignIn = ({ setShowForm2 }) => {
       password,
     };
 
-    dispatch(regUser(data));
+    dispatch(logUser(data));
   };
 
   return (
