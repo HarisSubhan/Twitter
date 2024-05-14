@@ -14,6 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/api/user", require("./routers/registerUser"));
+app.use("/api/tweets", require("./routers/tweetRoutes"));
 
 app.use(errorhandler);
 

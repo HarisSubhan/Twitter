@@ -1,5 +1,6 @@
 import React from "react";
 import { SidebarData } from "../data/sidebarData";
+import { Button } from "react-bootstrap";
 
 const Sidebar = () => {
   return (
@@ -14,6 +15,13 @@ const Sidebar = () => {
           </>
         );
       })}
+      <Button
+        style={{ backgroundColor: "1CA3F1" }}
+        className="shadow w-full border
+         rounded-pill p-1 fs-2"
+      >
+        Tweet
+      </Button>
     </>
   );
 };
