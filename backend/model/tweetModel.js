@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 
-// define structure for your collection/tables
-
 const tweetSchema = mongoose.Schema(
   {
     user: {

@@ -27,7 +27,6 @@ const registerUser = AsyncHandler(async (req, res) => {
         dob,
         password: hashedPass,
       });
-
       res.json({
         _id: createdUser._id,
         name: createdUser.name,
@@ -85,7 +84,7 @@ const findMyProfile = AsyncHandler(async (req, res) => {
 });
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECERT, { expiresIn: "1d" });
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 };
 
 module.exports = {
