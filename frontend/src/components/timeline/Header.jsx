@@ -6,6 +6,21 @@ import { LiaChartBarSolid } from "react-icons/lia";
 import { BsEmojiGrin } from "react-icons/bs";
 
 const Header = () => {
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageLoading, setImageLoading] = useState(false);
+
+  // userName: dl0wmamcy
+  // upload_preSet: la5xwjjh
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    const url = URL?.createObjectURL(file);
+    setImagePreview(url);
+    setImage(file);
+    console.log(url);
+  };
+
   return (
     <>
       <div className="d-flex mb-3 rounded-2 flex-column gap-4 bg-white py-3">
@@ -30,9 +45,40 @@ const Header = () => {
             className="border-0 hide-default-input-style"
           />
         </div>
+
+        {imagePreview && (
+          <div style={{ height: "250px" }} className="w-50 b-lock mx-auto">
+            <img
+              className=""
+              width={"100%"}
+              height={"100%"}
+              src={imagePreview}
+              alt=""
+            />
+          </div>
+        )}
+
         <div className="d-flex px-4 align-items-center justify-content-between">
           <div className="d-flex gap-3">
-            <CiImageOn color="#1CA3F1" cursor="pointer" size={30} />
+            <div className="position-relative">
+              <CiImageOn
+                onChange={handleImageChange}
+                color="#1CA3F1"
+                cursor="pointer"
+                size={30}
+              />
+              <input
+                type="file"
+                onChange={handleImageChange}
+                className="position-absolute"
+                style={{
+                  transform: "translate(-200%)",
+                  opacity: "0",
+                  cursor: "pointer",
+                  width: "30%",
+                }}
+              />
+            </div>
             <CiVideoOn color="#1CA3F1" cursor="pointer" size={30} />
             <LiaChartBarSolid color="#1CA3F1" cursor="pointer" size={30} />
             <BsEmojiGrin color="#1CA3F1" cursor="pointer" size={30} />

@@ -1,5 +1,6 @@
 const AsyncHandler = require("express-async-handler");
 const tweet = require("../model/tweetModel");
+
 const uploadTweet = AsyncHandler(async (req, res) => {
   // get the value from the frontend
   const { caption, content } = req.body;
@@ -9,6 +10,7 @@ const uploadTweet = AsyncHandler(async (req, res) => {
       caption,
       content,
     });
+    console.log(newTweet);
     res.send(newTweet);
   } catch (error) {
     console.log(error);
