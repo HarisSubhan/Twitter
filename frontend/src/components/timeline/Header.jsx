@@ -1,14 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { HiOutlineSparkles } from "react-icons/hi2";
 import { Button, Form } from "react-bootstrap";
 import { CiImageOn, CiVideoOn } from "react-icons/ci";
 import { LiaChartBarSolid } from "react-icons/lia";
 import { BsEmojiGrin } from "react-icons/bs";
-
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { uploadTweet, postReset } from "../../features/post/postSlice";
+import { Audio } from "react-loader-spinner";
+import { toast } from "react-hot-toast";
 const Header = () => {
+  const [caption, setCaption] = useState("");
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageLoading, setImageLoading] = useState(false);
+  const { postLoading, postError, postSuccess, postMessage } = useSelector(
+    (state) => state.post
+  );
+
+  const dispatch = useDispatch();
 
   // userName: dl0wmamcy
   // upload_preSet: la5xwjjh
@@ -20,6 +30,49 @@ const Header = () => {
     setImage(file);
     console.log(url);
   };
+
+  const uploadImage = async () => {
+    // get data from the input fields
+    const data = new FormData();
+    data.append("file", image);
+    data.append("upload_preset", "ls8frk5v");
+    // request to the cloudinary's api
+    try {
+      setImageLoading(true);
+      const response = await axios.post(
+        "https://api.cloudinary.com/v1_1/dwtsjgcyf/image/upload",
+        data
+      );
+      setImageLoading(false);
+      return response?.data?.url;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleTweet = async () => {
+    const imageData = await uploadImage(image);
+    const tweetData = {
+      caption,
+      content: imageData,
+    };
+    dispatch(uploadTweet(tweetData));
+  };
+
+  useEffect(() => {
+    if (postError) {
+      toast.error(postMessage);
+    }
+    if (postSuccess) {
+      toast.success("Tweeted Successfully", {
+        icon: "🐥",
+      });
+      setImagePreview(null);
+      setImage(null);
+      setCaption("");
+    }
+    dispatch(postReset());
+  }, [postError, postSuccess, postMessage, dispatch]);
 
   return (
     <>
@@ -43,11 +96,16 @@ const Header = () => {
             type="text"
             placeholder="Whats happening?"
             className="border-0 hide-default-input-style"
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
           />
         </div>
 
         {imagePreview && (
-          <div style={{ height: "250px" }} className="w-50 b-lock mx-auto">
+          <div
+            style={{ height: "250px", objectFit: "contain" }}
+            className="w-50 b-lock mx-auto"
+          >
             <img
               className=""
               width={"100%"}
@@ -84,10 +142,24 @@ const Header = () => {
             <BsEmojiGrin color="#1CA3F1" cursor="pointer" size={30} />
           </div>
           <Button
+            disabled={imageLoading || postLoading}
+            onClick={handleTweet}
             style={{ background: "#1CA3F1" }}
             className="shadow px-4 py-2 border-0 rounded-pill p-2"
           >
-            Tweet
+            {imageLoading || postLoading ? (
+              <Audio
+                height="30px"
+                width="100px"
+                radius="9"
+                color="#2f4d5e"
+                ariaLabel="three-dots-loading"
+                wrapperStyle
+                wrapperClass
+              />
+            ) : (
+              "Tweet"
+            )}
           </Button>
         </div>
       </div>
