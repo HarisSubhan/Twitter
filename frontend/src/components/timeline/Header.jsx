@@ -1,61 +1,104 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { HiOutlineSparkles } from "react-icons/hi2";
 import { Button, Form } from "react-bootstrap";
 import { CiImageOn, CiVideoOn } from "react-icons/ci";
 import { LiaChartBarSolid } from "react-icons/lia";
 import { BsEmojiGrin } from "react-icons/bs";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { uploadTweet, postReset } from "../../features/post/postSlice";
+import { postReset, uploadTweet } from "../../features/post/postSlice";
 import { Audio } from "react-loader-spinner";
 import { toast } from "react-hot-toast";
 const Header = () => {
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState(null);
+  const [video, setVideo] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [imageLoading, setImageLoading] = useState(false);
+  const [videoPreview, setVideoPreview] = useState(null);
+  const [contentLoading, setContentLoading] = useState(false);
+  const [error, setError] = useState(false);
+  // get the state into the component, using useSelector hook
   const { postLoading, postError, postSuccess, postMessage } = useSelector(
     (state) => state.post
   );
 
+  // get the useDispatch hook to fire/call the functions in the slice
   const dispatch = useDispatch();
 
-  // userName: dl0wmamcy
-  // upload_preSet: la5xwjjh
+  // username:dl0wmamcy
+  // upload_preset:la5xwjjh
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    const url = URL?.createObjectURL(file);
-    setImagePreview(url);
-    setImage(file);
-    console.log(url);
+    if (file.type.startsWith("image")) {
+      const url = URL?.createObjectURL(file);
+      setImagePreview(url);
+      setImage(file);
+      setVideo(null);
+      setVideoPreview(null);
+    } else if (file.type.startsWith("video")) {
+      const url = URL?.createObjectURL(file);
+      setVideoPreview(url);
+      setVideo(file);
+      setImage(null);
+      setImagePreview(null);
+    } else {
+      setError(true);
+      setVideo(null);
+      setImage(null);
+      setVideoPreview(null);
+      setImagePreview(null);
+    }
   };
 
-  const uploadImage = async () => {
-    // get data from the input fields
-    const data = new FormData();
-    data.append("file", image);
-    data.append("upload_preset", "ls8frk5v");
-    // request to the cloudinary's api
-    try {
-      setImageLoading(true);
-      const response = await axios.post(
-        "https://api.cloudinary.com/v1_1/dwtsjgcyf/image/upload",
-        data
-      );
-      setImageLoading(false);
-      return response?.data?.url;
-    } catch (error) {
-      console.log(error);
+  // upload the image to the cloudinary
+  const uploadContent = async () => {
+    if (image) {
+      // get data from the input fields
+      const data = new FormData();
+      data.append("file", image);
+      data.append("upload_preset", "la5xwjjh");
+      // request to the cloudinary's api
+      try {
+        setContentLoading(true);
+        const response = await axios.post(
+          "https://api.cloudinary.com/v1_1/dl0wmamcy/image/upload",
+          data
+        );
+        setContentLoading(false);
+        return response?.data?.url;
+      } catch (error) {
+        console.log(error);
+      }
+    } else if (video) {
+      // get data from the input fields
+      const data = new FormData();
+      data.append("file", video);
+      data.append("upload_preset", "la5xwjjh");
+      // request to the cloudinary's api
+      try {
+        setContentLoading(true);
+        const response = await axios.post(
+          "https://api.cloudinary.com/v1_1/dl0wmamcy/video/upload",
+          data
+        );
+        setContentLoading(false);
+        console.log(response);
+        return response?.data?.url;
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
   const handleTweet = async () => {
-    const imageData = await uploadImage(image);
+    const contentType = image ? image : video;
+    const contentData = await uploadContent(contentType);
     const tweetData = {
       caption,
-      content: imageData,
+      content: contentData,
     };
+
     dispatch(uploadTweet(tweetData));
   };
 
@@ -70,9 +113,20 @@ const Header = () => {
       setImagePreview(null);
       setImage(null);
       setCaption("");
+      setVideo(null);
+      setVideoPreview(null);
     }
     dispatch(postReset());
   }, [postError, postSuccess, postMessage, dispatch]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error("Invalid File Format");
+    }
+    setTimeout(() => {
+      setError(false);
+    }, 3000);
+  }, [error]);
 
   return (
     <>
@@ -102,29 +156,33 @@ const Header = () => {
         </div>
 
         {imagePreview && (
-          <div
-            style={{ height: "250px", objectFit: "contain" }}
-            className="w-50 b-lock mx-auto"
-          >
+          <div className="w-50 mx-auto d-block" style={{ height: "250px" }}>
             <img
-              className=""
               width={"100%"}
               height={"100%"}
+              style={{ objectFit: "contain" }}
               src={imagePreview}
               alt=""
             />
+          </div>
+        )}
+        {videoPreview && (
+          <div className="w-50 mx-auto d-block" style={{ height: "250px" }}>
+            <video
+              controls
+              width={"100%"}
+              height={"100%"}
+              style={{ objectFit: "fill" }}
+              src={videoPreview}
+              alt=""
+            ></video>
           </div>
         )}
 
         <div className="d-flex px-4 align-items-center justify-content-between">
           <div className="d-flex gap-3">
             <div className="position-relative">
-              <CiImageOn
-                onChange={handleImageChange}
-                color="#1CA3F1"
-                cursor="pointer"
-                size={30}
-              />
+              <CiImageOn color="#1CA3F1" cursor="pointer" size={30} />
               <input
                 type="file"
                 onChange={handleImageChange}
@@ -142,12 +200,12 @@ const Header = () => {
             <BsEmojiGrin color="#1CA3F1" cursor="pointer" size={30} />
           </div>
           <Button
-            disabled={imageLoading || postLoading}
+            disabled={contentLoading || postLoading}
             onClick={handleTweet}
             style={{ background: "#1CA3F1" }}
             className="shadow px-4 py-2 border-0 rounded-pill p-2"
           >
-            {imageLoading || postLoading ? (
+            {contentLoading || postLoading ? (
               <Audio
                 height="30px"
                 width="100px"

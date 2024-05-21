@@ -1,7 +1,16 @@
+import React, { useEffect } from "react";
 import Header from "./Header";
 import Tweets from "./Tweets";
+import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
+import { getTweetData, postReset } from "../../features/post/postSlice";
+import TweetLoading from "../loading/TweetLoading";
 
 const Content = () => {
+  const { postError, postMessage, postLoading } = useSelector(
+    (state) => state.post
+  );
+  let test = true;
   return (
     <>
       <div
@@ -9,7 +18,7 @@ const Content = () => {
         className="col-lg-10 mx-auto"
       >
         <Header />
-        <Tweets />
+        {postLoading ? <TweetLoading /> : <Tweets />}
       </div>
     </>
   );

@@ -1,13 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getAllTweets, postTweet } from "./postService";
 
+// define your initialState
+
 const initialState = {
-  post: [],
-  myPost: [],
+  posts: [],
+  myPosts: [],
   postLoading: false,
   postSuccess: false,
   postError: false,
-  postMessage: "",
+  postMessage: false,
 };
 
 export const uploadTweet = createAsyncThunk(
@@ -35,13 +37,13 @@ export const getTweetData = createAsyncThunk(
 );
 
 export const postSlice = createSlice({
-  name: "post",
+  name: "posts",
   initialState,
   reducers: {
     postReset: (state) => {
       state.postLoading = false;
-      state.postSuccess = false;
       state.postError = false;
+      state.postSuccess = false;
       state.postMessage = "";
     },
   },
@@ -53,7 +55,7 @@ export const postSlice = createSlice({
       .addCase(uploadTweet.rejected, (state, action) => {
         state.postLoading = false;
         state.postError = true;
-        state.postError = true;
+        state.message = action.payload;
       })
       .addCase(uploadTweet.fulfilled, (state, action) => {
         state.postLoading = false;
@@ -70,7 +72,7 @@ export const postSlice = createSlice({
       })
       .addCase(getTweetData.fulfilled, (state, action) => {
         state.postLoading = false;
-        state.postSuccess = true;
+        // state.postSuccess = true;
         state.posts = action.payload;
       });
   },

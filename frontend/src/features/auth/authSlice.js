@@ -1,14 +1,12 @@
-// 1.always import these two packages in every slice
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginUser, logoutUser, registerUser } from "./authService";
-
-// check for user in the localStorage
-// get the item with the name of user
-// convert the string into object
+import {
+  getAllUsers,
+  loginUser,
+  logoutUser,
+  registerUser,
+} from "./authService";
 
 const isUserAvailable = JSON.parse(localStorage.getItem("user"));
-
-// 2.define your initial state
 
 const initialState = {
   user: isUserAvailable ? isUserAvailable : null,
@@ -16,9 +14,8 @@ const initialState = {
   isSuccess: false,
   isError: false,
   message: "",
+  allUsers: [],
 };
-
-// handle the states of register user
 
 export const regUser = createAsyncThunk(
   "auth/reg-user",
@@ -53,7 +50,17 @@ export const logout = createAsyncThunk("auth/logout", (_, thunkAPI) => {
   }
 });
 
-// 3. create your slice to make your state global
+export const getAllUserData = createAsyncThunk(
+  "auth/get-all-users",
+  async (_, thunkAPI) => {
+    try {
+      return await getAllUsers();
+    } catch (error) {
+      const message = error.response.data.message;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
 
 export const authSlice = createSlice({
   name: "auth",
@@ -106,6 +113,18 @@ export const authSlice = createSlice({
       })
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
+        state.isSuccess = true;
+      })
+      .addCase(getAllUserData.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getAllUserData.rejected, (state) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = "Error loging out";
+      })
+      .addCase(getAllUserData.fulfilled, (state, action) => {
+        state.allUsers = action.payload;
         state.isSuccess = true;
       });
   },

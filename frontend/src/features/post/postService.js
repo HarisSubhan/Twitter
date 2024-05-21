@@ -1,10 +1,10 @@
 import axios from "axios";
-
-const base_url = "http://localhost:3001/api/tweets/";
+const base_url = "http://localhost:3001/api/tweets";
 
 export const postTweet = async (tweetData, token) => {
+  console.log(tweetData);
   const config = {
-    Headers: {
+    headers: {
       Authorization: `Bearer ${token}`,
     },
   };
@@ -17,6 +17,6 @@ export const postTweet = async (tweetData, token) => {
 };
 
 export const getAllTweets = async () => {
-  const response = await axios.get(`${base_url}/get-tweets`);
+  const response = await axios.get(`${base_url}/get-tweet`);
   return response.data;
 };
