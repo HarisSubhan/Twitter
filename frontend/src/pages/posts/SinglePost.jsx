@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { getTweetData } from "../../features/post/postSlice";
 import { getAllUserData } from "../../features/auth/authSlice";
+import { Typography } from "@mui/material";
 const SinglePost = () => {
   // get the posts state
   const { posts, postLoading, postError, postMessage } = useSelector(
@@ -24,13 +25,13 @@ const SinglePost = () => {
 
   // get specific post
   const findPost = posts?.find((item, index) => {
-    return item?._id == id;
+    return item?._id === id;
   });
 
   // find user who has uploaded the post
 
   const findUser = allUsers?.find((item, index) => {
-    return item?._id == findPost?.user;
+    return item?._id === findPost?.user;
   });
   const checkType = findPost?.content?.split("/")[4];
 
@@ -39,7 +40,7 @@ const SinglePost = () => {
       <Container>
         <Row>
           <Col md={6}>
-            {checkType == "image" ? (
+            {checkType === "image" ? (
               <>
                 <img
                   width={"100%"}
@@ -70,7 +71,7 @@ const SinglePost = () => {
                 style={{ objectFit: "contain" }}
                 alt=""
               />
-              <h5>{findUser?.name}</h5>
+              <Typography variant="h5">{findUser?.name}</Typography>
             </div>
           </Col>
         </Row>
